@@ -1,4 +1,4 @@
-# DecFSM - 
+# DecFSM
 A Easy-to-use enum driven Header Only Finite State Machine for My Personal Game
 
 ## Introduction
