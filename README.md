@@ -1,4 +1,5 @@
-# DecFSM - A Easy-to-use Header Only Finite State Machine for My Personal Game
+# DecFSM - 
+A Easy-to-use enum driven Header Only Finite State Machine for My Personal Game
 
 ## Introduction
 This is just a sharing of source code for a Finite State Machine I used in my Project.
