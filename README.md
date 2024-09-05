@@ -27,3 +27,6 @@ This is just a sharing of source code for a Finite State Machine I used in my Pr
 <br/><br/>
 Result : <br/>
 ![image](https://github.com/user-attachments/assets/24c4aad1-a79d-46e4-888d-57d3b58358af)
+<br/><br/>
+Programme Diagram : <br/>
+![image](https://github.com/user-attachments/assets/7e67bd2a-5b20-4ae3-9922-cda3983fe652)
