@@ -1,80 +1,149 @@
 #include <iostream>
-
+#include <cstdlib>
 #include "DecFSM.h"
 
 enum my_state{
-    A = 0,
-    B = 1,
-    C = 2,
+    IDLE = 0,
+    WALK = 1,
+    RUN = 2,
 };
 
+const char* my_state_name(int st){
+    switch (st)
+    {
+    case my_state::IDLE:
+        return "IDLE";
+        break;
+    case my_state::WALK:
+        return "WALK";
+        break;
+    case my_state::RUN:
+        return "RUN";
+        break;
+    default:
+        return "UNKNOWN";
+        break;
+    };
+}
 
-struct A_to_B : public DecFSM::base_transition
-{
-    A_to_B() : base_transition(){
-        this->set_from_state(my_state::A);
-        this->set_target_state(my_state::B);
-    }
-    
-    bool condition() override{
-        return true;
-    }
+struct evt{
+    float speed = 0;
 };
 
-struct A_to_C : public DecFSM::base_transition
+float run_speed = 250;
+
+struct IDLE_to_WALK : public DecFSM::base_transition<evt>
 {
-    A_to_C() : base_transition(){
-        this->set_from_state(my_state::A);
-        this->set_target_state(my_state::C);
+    IDLE_to_WALK() : base_transition(){
+        this->set_from_state(my_state::IDLE);
+        this->set_target_state(my_state::WALK);
         this->set_priority(254);
     }
     
-    bool condition() override{
-        return true;
+    bool condition(evt _evt) override{
+        bool ret;
+        ret = abs(_evt.speed) != 0;
+        return ret;
     }
 };
 
-struct B_to_C : public DecFSM::base_transition
+struct IDLE_to_RUN : public DecFSM::base_transition<evt>
 {
-    B_to_C() : base_transition(){
-        this->set_from_state(my_state::B);
-        this->set_target_state(my_state::C);
+    IDLE_to_RUN() : base_transition(){
+        this->set_from_state(my_state::IDLE);
+        this->set_target_state(my_state::RUN);
     }
     
-    bool condition() override{
-        return true;
+    bool condition(evt _evt) override{
+        return abs(_evt.speed) >= run_speed;
     }
 };
 
-struct C_to_A : public DecFSM::base_transition
+struct WALK_to_RUN : public DecFSM::base_transition<evt>
 {
-    C_to_A() : base_transition(){
-        this->set_from_state(my_state::C);
-        this->set_target_state(my_state::A);
+    WALK_to_RUN() : base_transition(){
+        this->set_from_state(my_state::WALK);
+        this->set_target_state(my_state::RUN);
     }
     
-    bool condition() override{
-        return true;
+    bool condition(evt _evt) override{
+        return abs(_evt.speed) >= run_speed;
+    }
+};
+struct WALK_to_IDLE : public DecFSM::base_transition<evt>
+{
+    WALK_to_IDLE() : base_transition(){
+        this->set_from_state(my_state::WALK);
+        this->set_target_state(my_state::IDLE);
+    }
+    
+    bool condition(evt _evt) override{
+        return abs(_evt.speed) == 0;
+    }
+};
+
+struct RUN_to_IDLE : public DecFSM::base_transition<evt>
+{
+    RUN_to_IDLE() : base_transition(){
+        this->set_from_state(my_state::RUN);
+        this->set_target_state(my_state::IDLE);
+    }
+    
+    bool condition(evt _evt) override{
+        return abs(_evt.speed) == 0;
+    }
+};
+
+struct RUN_to_WALK : public DecFSM::base_transition<evt>
+{
+    RUN_to_WALK() : base_transition(){
+        this->set_from_state(my_state::RUN);
+        this->set_target_state(my_state::WALK);
+    }
+    
+    bool condition(evt _evt) override{
+        return abs(_evt.speed) != 0 && abs(_evt.speed) < run_speed; 
     }
 };
 
 
 int main(){
-    DecFSM::dec_fsm fsm(my_state::A);
-    A_to_B trans1;
-    A_to_C trans1_2;
-    B_to_C trans2;
-    C_to_A trans3;
-    fsm.add_row(&trans1);
-    fsm.add_row(&trans1_2);
-    fsm.add_row(&trans2);
-    fsm.add_row(&trans3);
-    std::cout << fsm.get_current_state() << std::endl;
-    fsm.process();
-    std::cout << fsm.get_current_state() << std::endl;
-    fsm.process();
-    std::cout << fsm.get_current_state() << std::endl;
-    fsm.process();
-    std::cout << fsm.get_current_state() << std::endl;
+    DecFSM::dec_fsm<evt> fsm(my_state::IDLE);
+    IDLE_to_WALK trans1;
+    IDLE_to_WALK trans2;
+    WALK_to_IDLE trans3;
+    WALK_to_RUN trans4;
+    RUN_to_IDLE trans5;
+    RUN_to_WALK trans6;
+    
+    fsm.register_transition(&trans1);
+    fsm.register_transition(&trans2);
+    fsm.register_transition(&trans3);
+    fsm.register_transition(&trans4);
+    fsm.register_transition(&trans5);
+    fsm.register_transition(&trans6);
+
+    evt _evt;
+
+    for (size_t i = 0; i < 1000; i++)
+    {
+        if(i == 150){
+            _evt.speed = run_speed/2;
+        }
+        if(i == 350){
+            _evt.speed = run_speed;
+        }
+        if(i == 600){
+            _evt.speed = run_speed/2;
+        }
+        if(i == 800){
+            _evt.speed = 0;
+        }
+        std::cout << i << " : " << my_state_name(fsm.get_current_state()) << "(speed = " << _evt.speed << ")" << std::endl;
+        fsm.process(_evt);
+    }
+    
+
+
     return 0;
 }

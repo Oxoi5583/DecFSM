@@ -19,12 +19,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LIB_PATH})
 set(EXECUTABLE_OUTPUT_PATH ${EXE_PATH})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${EXE_PATH})
 
-add_library(${PROJECT_NAME} ${LIB_SRC_FILES})
-target_include_directories(${PROJECT_NAME} PUBLIC ./include)
+
 
 file(GLOB EXE_SRC_FILES "test/*.c*")
 
 add_executable(test ${EXE_SRC_FILES})
 target_include_directories(test PUBLIC ./include)
-target_link_directories(test PRIVATE ${LIB_PATH}/${CMAKE_BUILD_TYPE})
-target_link_libraries(test ${PROJECT_NAME})

@@ -177,10 +177,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
-    <ProjectReference Include="E:\_Coding\CPP\DecFSM\build\DecFSM.vcxproj">
-      <Project>{1F47C1F2-05B5-3A75-8A4A-5395DF43EFB6}</Project>
-      <Name>DecFSM</Name>
-    </ProjectReference>
     <ProjectReference Include="E:\_Coding\CPP\DecFSM\build\test.vcxproj">
       <Project>{85F00F0C-7125-3795-81B6-3B23A1AEA78C}</Project>
       <Name>test</Name>
