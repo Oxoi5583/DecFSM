@@ -108,7 +108,10 @@ struct RUN_to_WALK : public DecFSM::base_transition<evt>
 
 
 int main(){
+    // Instance fsm and give a Entry state
     DecFSM::dec_fsm<evt> fsm(my_state::IDLE);
+
+    // Instance all transition
     IDLE_to_WALK trans1;
     IDLE_to_WALK trans2;
     WALK_to_IDLE trans3;
@@ -116,6 +119,7 @@ int main(){
     RUN_to_IDLE trans5;
     RUN_to_WALK trans6;
     
+    // register all transition
     fsm.register_transition(&trans1);
     fsm.register_transition(&trans2);
     fsm.register_transition(&trans3);
@@ -123,10 +127,12 @@ int main(){
     fsm.register_transition(&trans5);
     fsm.register_transition(&trans6);
 
+    // Instance event data
     evt _evt;
 
     for (size_t i = 0; i < 1000; i++)
     {
+        // change event data
         if(i == 150){
             _evt.speed = run_speed/2;
         }
@@ -139,7 +145,10 @@ int main(){
         if(i == 800){
             _evt.speed = 0;
         }
-        std::cout << i << " : " << my_state_name(fsm.get_current_state()) << "(speed = " << _evt.speed << ")" << std::endl;
+        if(i%20 == 0){
+            std::cout << i << " : " << my_state_name(fsm.get_current_state()) << "(speed = " << _evt.speed << ")" << std::endl;
+        }
+        // pass the event data to FSM and check transition
         fsm.process(_evt);
     }
     
