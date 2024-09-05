@@ -15,7 +15,7 @@ This is just a sharing of source code for a Finite State Machine I used in my Pr
 3. Declare a struct for repesenting event data.<br/>
 ![image](https://github.com/user-attachments/assets/af4ec36f-1470-497f-9a6b-77bd0ce3276e)
 
-4. Declare a struct for repesenting transition.(inherit from DecFSM::base_transition<evt>)<br/>   The base struct will need a class argument which should be your event data struct.<br/>   Remember to tell the transition what is the from state and to state and the condition when to transit.<br/>
+4. Declare a struct for repesenting transition.(inherit from DecFSM::base_transition<evt>)<br/>   The base struct will need a class argument which should be your event data struct.<br/>   Remember to tell the transition what is the from state and to state and the condition to decide when to transit.<br/>   Set priority if needed.<br/>
 ![image](https://github.com/user-attachments/assets/ac58bf72-7ec8-454b-815a-40a55b18421b)
 
 5. Instance the FSM, transitions and register them to FSM.<br/>
