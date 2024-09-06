@@ -193,7 +193,13 @@ int main(){
             _evt.speed = 0;
         }
         if(i%20 == 0){
-            std::cout << i << " : " << my_state_name(fsm.get_current_state()) << "(speed = " << _evt.speed << ")" << std::endl;
+            std::cout 
+            << i 
+            << " : " 
+            << my_state_name(fsm.get_current_state()) 
+            << "(speed = " 
+            << _evt.speed << ")" 
+            << std::endl;
         }
         // pass the event data to FSM and check transition
         fsm.process(_evt);
@@ -203,3 +209,6 @@ int main(){
 
     return 0;
 }
+
+
+
