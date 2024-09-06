@@ -11,9 +11,20 @@ typedef uint8_t priority;
 
 namespace DecFSM{
 
-struct base_event{
-
+struct base_action {
+    protected:
+        state on_state;
+    public:
+        state get_on_state(){
+            return this->on_state;
+        };
+        void set_on_state(state _on_state){
+            this->on_state = _on_state;
+        };
+        virtual void enter(){};
+        virtual void exit(){};
 };
+
 
 template<class Event>
 struct base_transition {
@@ -43,18 +54,27 @@ struct base_transition {
 };
 
 
+typedef base_action action;
 
 template<class Event>
 class dec_fsm {
     typedef base_transition<Event> transition;
 protected:
+    bool is_engine_started = false;
     state current_state;
     unordered_map<state, list<transition*>> cylinder;
+    unordered_map<state, action*> actions;
+    void do_enter_and_exit_job(state old_state, state new_state);
+    void do_enter_job(state enter_state);
+    void do_exit_job(state exit_state);
+    bool check_transit(transition* trans, Event _event);
 public:
     dec_fsm(state _entry_state) : current_state(_entry_state){};
     ~dec_fsm(){};
     void register_transition(transition* _transition);
+    void register_action(action* _action);
     void process(Event _event);
+    void start_engine();
     state get_current_state();
 }; 
 
@@ -115,14 +135,61 @@ void dec_fsm<Event>::register_transition(transition* _transition){
 } 
  
 template<class Event>
+void dec_fsm<Event>::register_action(action* _action){
+    state _on_state = _action->get_on_state();
+    if(!actions.contains(_on_state)){
+        actions.insert_or_assign(_on_state, _action);
+    }
+} 
+ 
+
+template<class Event>
+void dec_fsm<Event>::do_enter_and_exit_job(state old_state, state new_state){
+    // exit
+    this->do_exit_job(old_state);
+    // enter
+    this->do_enter_job(new_state);
+}
+
+template<class Event>
+void dec_fsm<Event>::do_enter_job(state enter_state){
+    if(actions.contains(enter_state)){
+        actions[enter_state]->enter();
+    }
+}
+
+template<class Event>
+void dec_fsm<Event>::do_exit_job(state exit_state){
+    if(actions.contains(exit_state)){
+        actions[exit_state]->exit();
+    }
+}
+
+template<class Event>
+bool dec_fsm<Event>::check_transit(transition* trans, Event _event){
+    if(trans->condition(_event)){
+        state new_state = trans->get_target_state();
+        state old_state = current_state;
+        do_enter_and_exit_job(old_state,new_state);
+
+        current_state = new_state;
+        return true;
+    }else{
+        return false;
+    }
+}
+
+template<class Event>
 void dec_fsm<Event>::process(Event _event){
+    if(!this->is_engine_started){
+        this->start_engine();
+    }
     if(this->cylinder.contains(current_state)){
         //std::cout << "State Exists" << std::endl;
         list<transition*> _ls = cylinder[current_state];
         for (auto it = _ls.begin(); it != _ls.end(); it++){
             transition* trans = *(it);
-            if(trans->condition(_event)){
-                current_state = trans->get_target_state();
+            if(this->check_transit(trans, _event)){
                 break;
             }
         }
@@ -130,7 +197,14 @@ void dec_fsm<Event>::process(Event _event){
 }
 
 template<class Event>
+void dec_fsm<Event>::start_engine(){
+    this->is_engine_started = true;
+    do_enter_job(this->current_state);
+}
+
+template<class Event>
 state dec_fsm<Event>::get_current_state(){
     return this->current_state;
 }
+
 }

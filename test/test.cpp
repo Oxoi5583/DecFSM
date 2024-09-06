@@ -106,12 +106,49 @@ struct RUN_to_WALK : public DecFSM::base_transition<evt>
     }
 };
 
+struct RUN_action : public DecFSM::base_action{
+    RUN_action(){
+        this->set_on_state(my_state::RUN);
+    };
+    void enter() override{
+        std::cout << "Enter Run State" << std::endl;
+    };
+    void exit() override{
+        std::cout << "Exit Run State" << std::endl;
+    };
+};
+
+struct WALK_action : public DecFSM::base_action{
+    WALK_action(){
+        this->set_on_state(my_state::WALK);
+    };
+    void enter() override{
+        std::cout << "Enter Walk State" << std::endl;
+    };
+    void exit() override{
+        std::cout << "Exit Walk State" << std::endl;
+    };
+};
+
+struct IDLE_action : public DecFSM::base_action{
+    IDLE_action(){
+        this->set_on_state(my_state::IDLE);
+    };
+    void enter() override{
+        std::cout << "Enter IDLE State" << std::endl;
+    };
+    void exit() override{
+        std::cout << "Exit IDLE State" << std::endl;
+    };
+};
+
+
 
 int main(){
     // Instance fsm and give a Entry state
     DecFSM::dec_fsm<evt> fsm(my_state::IDLE);
 
-    // Instance all transition
+    // Instance all transitions
     IDLE_to_WALK trans1;
     IDLE_to_WALK trans2;
     WALK_to_IDLE trans3;
@@ -119,13 +156,23 @@ int main(){
     RUN_to_IDLE trans5;
     RUN_to_WALK trans6;
     
-    // register all transition
+    // register all transitions
     fsm.register_transition(&trans1);
     fsm.register_transition(&trans2);
     fsm.register_transition(&trans3);
     fsm.register_transition(&trans4);
     fsm.register_transition(&trans5);
     fsm.register_transition(&trans6);
+
+    // Instance all actions
+    WALK_action action1;
+    IDLE_action action2;
+    RUN_action action3;
+
+    // register all action
+    fsm.register_action(&action1);
+    fsm.register_action(&action2);
+    fsm.register_action(&action3);
 
     // Instance event data
     evt _evt;
