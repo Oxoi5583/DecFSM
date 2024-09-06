@@ -18,15 +18,22 @@ This is just a sharing of source code for a Finite State Machine I used in my Pr
 4. Declare a struct for repesenting transition.(inherit from DecFSM::base_transition<evt>)<br/>   The base struct will need a class argument which should be your event data struct.<br/>   Remember to tell the transition what is the from state and to state and the condition to decide when to transit.<br/>   Set priority if needed.<br/>
 ![image](https://github.com/user-attachments/assets/ac58bf72-7ec8-454b-815a-40a55b18421b)
 
+5. Declare a struct and inherit from DecFSM::base_action<evt><br/>
+   and override enter() and exit() method.<br/>
+   then set the on_state in the constructor.<br/>
+![image](https://github.com/user-attachments/assets/d367a04d-19bf-4f22-9178-632a558b6d80)
+
 5. Instance the FSM, transitions and register them to FSM.<br/>
 ![image](https://github.com/user-attachments/assets/300158dc-f275-483a-86b4-56dfd761fb5a)
 
 6. Instance a Event data struct, prvoke the process() function in FSM. And change Event data.<br/>
-![image](https://github.com/user-attachments/assets/9fb01e45-fade-4306-9ab2-68bed4f3eb4e)
+![image](https://github.com/user-attachments/assets/4a638e2b-8bcc-42fa-9624-2eee52943fbe)
+
 
 <br/><br/>
 Result : <br/>
-![image](https://github.com/user-attachments/assets/24c4aad1-a79d-46e4-888d-57d3b58358af)
+![image](https://github.com/user-attachments/assets/7b381fc3-342b-41e1-9871-8b7c748bf16c)
+
 <br/><br/>
 Programme Diagram : <br/>
 ![image](https://github.com/user-attachments/assets/7e67bd2a-5b20-4ae3-9922-cda3983fe652)
