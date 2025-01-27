@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "test.dir\\Debug\\test.obj",
+            "outputs": [
+                "E:\\_Coding\\CPP\\DecFSM\\bin\\test.dir\\Debug\\vc143.pdb",
+                "test.dir\\Debug\\"
+            ],
+            "requires": []
+        }
+    ]
+}

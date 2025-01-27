@@ -1,210 +1,66 @@
+#include <DecFSM2.h>
 #include <iostream>
-#include <cstdlib>
-#include "DecFSM.h"
 
-enum my_state{
-    IDLE = 0,
-    WALK = 1,
-    RUN = 2,
+class Player{
+public:
+    void action_idle(){std::cout << "Idling" << std::endl;};
+    void action_walk(){std::cout << "Walking" << std::endl;};
+    void action_run(){std::cout << "Running" << std::endl;};
+
+    void enter_idle(){std::cout << "Start Idle" << std::endl;};
+    void enter_walk(){std::cout << "Start Walk" << std::endl;};
+    void enter_run(){std::cout << "Start Run" << std::endl;};
+
+
+    bool is_walking(){return walking;};
+    bool is_running(){return running;}
+
+    bool walking = false;
+    bool running = false;
+private:
+
 };
-
-const char* my_state_name(int st){
-    switch (st)
-    {
-    case my_state::IDLE:
-        return "IDLE";
-        break;
-    case my_state::WALK:
-        return "WALK";
-        break;
-    case my_state::RUN:
-        return "RUN";
-        break;
-    default:
-        return "UNKNOWN";
-        break;
-    };
-}
-
-struct evt{
-    float speed = 0;
-};
-
-float run_speed = 250;
-
-struct IDLE_to_WALK : public DecFSM::base_transition<evt>
-{
-    IDLE_to_WALK() : base_transition(){
-        this->set_from_state(my_state::IDLE);
-        this->set_target_state(my_state::WALK);
-        this->set_priority(254);
-    }
-    
-    bool condition(evt _evt) override{
-        bool ret;
-        ret = abs(_evt.speed) != 0;
-        return ret;
-    }
-};
-
-struct IDLE_to_RUN : public DecFSM::base_transition<evt>
-{
-    IDLE_to_RUN() : base_transition(){
-        this->set_from_state(my_state::IDLE);
-        this->set_target_state(my_state::RUN);
-    }
-    
-    bool condition(evt _evt) override{
-        return abs(_evt.speed) >= run_speed;
-    }
-};
-
-struct WALK_to_RUN : public DecFSM::base_transition<evt>
-{
-    WALK_to_RUN() : base_transition(){
-        this->set_from_state(my_state::WALK);
-        this->set_target_state(my_state::RUN);
-    }
-    
-    bool condition(evt _evt) override{
-        return abs(_evt.speed) >= run_speed;
-    }
-};
-struct WALK_to_IDLE : public DecFSM::base_transition<evt>
-{
-    WALK_to_IDLE() : base_transition(){
-        this->set_from_state(my_state::WALK);
-        this->set_target_state(my_state::IDLE);
-    }
-    
-    bool condition(evt _evt) override{
-        return abs(_evt.speed) == 0;
-    }
-};
-
-struct RUN_to_IDLE : public DecFSM::base_transition<evt>
-{
-    RUN_to_IDLE() : base_transition(){
-        this->set_from_state(my_state::RUN);
-        this->set_target_state(my_state::IDLE);
-    }
-    
-    bool condition(evt _evt) override{
-        return abs(_evt.speed) == 0;
-    }
-};
-
-struct RUN_to_WALK : public DecFSM::base_transition<evt>
-{
-    RUN_to_WALK() : base_transition(){
-        this->set_from_state(my_state::RUN);
-        this->set_target_state(my_state::WALK);
-    }
-    
-    bool condition(evt _evt) override{
-        return abs(_evt.speed) != 0 && abs(_evt.speed) < run_speed; 
-    }
-};
-
-struct RUN_action : public DecFSM::base_action{
-    RUN_action(){
-        this->set_on_state(my_state::RUN);
-    };
-    void enter() override{
-        std::cout << "Enter Run State" << std::endl;
-    };
-    void exit() override{
-        std::cout << "Exit Run State" << std::endl;
-    };
-};
-
-struct WALK_action : public DecFSM::base_action{
-    WALK_action(){
-        this->set_on_state(my_state::WALK);
-    };
-    void enter() override{
-        std::cout << "Enter Walk State" << std::endl;
-    };
-    void exit() override{
-        std::cout << "Exit Walk State" << std::endl;
-    };
-};
-
-struct IDLE_action : public DecFSM::base_action{
-    IDLE_action(){
-        this->set_on_state(my_state::IDLE);
-    };
-    void enter() override{
-        std::cout << "Enter IDLE State" << std::endl;
-    };
-    void exit() override{
-        std::cout << "Exit IDLE State" << std::endl;
-    };
-};
-
 
 
 int main(){
-    // Instance fsm and give a Entry state
-    DecFSM::dec_fsm<evt> fsm(my_state::IDLE);
+    Player* player = new Player();
 
-    // Instance all transitions
-    IDLE_to_WALK trans1;
-    IDLE_to_WALK trans2;
-    WALK_to_IDLE trans3;
-    WALK_to_RUN trans4;
-    RUN_to_IDLE trans5;
-    RUN_to_WALK trans6;
-    
-    // register all transitions
-    fsm.register_transition(&trans1);
-    fsm.register_transition(&trans2);
-    fsm.register_transition(&trans3);
-    fsm.register_transition(&trans4);
-    fsm.register_transition(&trans5);
-    fsm.register_transition(&trans6);
+    State<Player>* idle_state = new State<Player>(&Player::action_idle,&Player::enter_idle);
+    State<Player>* walk_state = new State<Player>(&Player::action_walk,&Player::enter_walk);
+    State<Player>* run_state = new State<Player>(&Player::action_run,&Player::enter_run);
 
-    // Instance all actions
-    WALK_action action1;
-    IDLE_action action2;
-    RUN_action action3;
+    Transition<Player>* idle_to_walk_transition = new Transition(idle_state,walk_state,&Player::is_walking,false);
+    Transition<Player>* walk_to_idle_transition = new Transition(walk_state,idle_state,&Player::is_walking, true);
+    Transition<Player>* walk_to_run_transition = new Transition(walk_state,run_state,&Player::is_running, false);
+    Transition<Player>* run_to_walk_transition = new Transition(run_state,walk_state,&Player::is_running, true);
 
-    // register all action
-    fsm.register_action(&action1);
-    fsm.register_action(&action2);
-    fsm.register_action(&action3);
+    DecFSM<Player>* fsm = new DecFSM<Player>(player,idle_state);
+    fsm->add_transition(idle_to_walk_transition);
+    fsm->add_transition(walk_to_idle_transition);
+    fsm->add_transition(walk_to_run_transition);
+    fsm->add_transition(run_to_walk_transition);
 
-    // Instance event data
-    evt _evt;
 
-    for (size_t i = 0; i < 1000; i++)
-    {
-        // change event data
-        if(i == 150){
-            _evt.speed = run_speed/2;
+    for(int i = 0; i < 100; i++){
+        fsm->_process();
+        if(i == 10){
+            std::cout << i << " : " << "Player Start Walking" << std::endl;
+            player->walking = true;
         }
-        if(i == 350){
-            _evt.speed = run_speed;
+        if(i == 50){
+            std::cout << i << " : " << "Player Start Running" << std::endl;
+            player->running = true;
         }
-        if(i == 600){
-            _evt.speed = run_speed/2;
+        if(i == 70){
+            std::cout << i << " : " << "Player Stop Running" << std::endl;
+            player->running = false;
         }
-        if(i == 800){
-            _evt.speed = 0;
+        if(i == 80){
+            std::cout << i << " : " << "Player Stop Walking" << std::endl;
+            player->walking = false;
         }
-        if(i%20 == 0){
-            std::cout 
-            << i 
-            << " : " 
-            << my_state_name(fsm.get_current_state()) 
-            << "(speed = " 
-            << _evt.speed << ")" 
-            << std::endl;
-        }
-        // pass the event data to FSM and check transition
-        fsm.process(_evt);
+        
     }
-    
 
 
     return 0;
